@@ -11,6 +11,7 @@ import People from '@/pages/discuss/people'
 import Custom from '@/pages/discuss/custom'
 import City from '@/pages/discuss/city'
 import notFound from "@/components/notFound/notFound";
+import Postings from "@/pages/moreoperation/postings";
 
 Vue.use(Router)
 
@@ -33,7 +34,7 @@ export default new Router({
       component: Discuss,
       children: [
         {
-          path: '/',
+          path: "/",
           name: "History",
           component: History
         },
@@ -68,6 +69,11 @@ export default new Router({
       path: "/me",
       name: "Me",
       component: Me
+    },
+    {
+      path: "/postings",
+      name: "Postings",
+      component: Postings
     },
     {
       path: "/infocenter",

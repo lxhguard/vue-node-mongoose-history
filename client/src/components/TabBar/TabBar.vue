@@ -22,7 +22,7 @@
                 <span class="tab-item" @click="GoTo('/samecity')" :class="{on: '/samecity' === $route.path}">
                     <Icon type="ios-home" size="20" />
                     <span>
-                        同城
+                        动态
                     </span>
                 </span>
                 <span class="tab-item" @click="GoTo('/me')" :class="{on: '/me' === $route.path}">

@@ -28,7 +28,8 @@ router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
-/*  用于接收前端的用户信息修改:头像+文字
+/*  
+  用于接收前端的用户信息修改:头像+文字
 */
 router.post("/uploadFile", function(req, res, next) {
   upload(req, res, function (err) {//upload-start
@@ -40,7 +41,7 @@ router.post("/uploadFile", function(req, res, next) {
     let formData = req.body;
 
     // 头像路径filePath 赋初始值 为默认头像;req.files代表的图片数组,这里前端限制了头像只能选第一张，所以传递过来的数组只有一个。但是下面的代码也适用于多张图片。
-    var filePath = "http://localhost:4444/public/images/uploads/default.png";
+    var filePath = formData.avatarurl;
     req.files.forEach((item, index) => {
       //如果用户上传头像，则取用户上传的头像，存储，赋值
       filePath = `http://localhost:4444/public/images/uploads/${item.filename}`;
@@ -48,11 +49,25 @@ router.post("/uploadFile", function(req, res, next) {
       console.log(filePath);
     });//至此如果头像被上传了新的，那么filePath会有一个新的数值
     //至此，有用的数据:用户修改的信息formData(username,disc,_id),头像路径filePath
+    console.log(formData)
+    //开始更新数据库
+    Info.update({
+      username:formData.username
+    },{
+        disc: formData.disc,
+        nickname: formData.nickname,
+        age: formData.age,
+        sex: formData.sex,
+        address: formData.address,
+        avatarurl: filePath
+    }).then(function(){
+      res.json({
+        avatarurl: filePath,
+        msg: "恭喜你,修改个人信息成功!"
+      });
+    })
 
-    res.json({
-      avatarurl: filePath,
-      msg: "恭喜你,修改个人信息成功!"
-    });
+    
   });//upload-end
 });
 

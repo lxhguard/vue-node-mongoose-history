@@ -65,31 +65,35 @@ app.use(function (req, res, next) {
   console.log('匹配正则后');
   console.log(url);
 
-  // 把登陆和注册请求去掉了，其他的多有请求都需要进行token校验
-  if (url != "/users/login" && url != "/users/register") {
+  // 把登陆，注册，发送验证码请求去掉了，其他的多有请求都需要进行token校验
+  if (
+    url != "/users/login" &&
+    url != "/users/register" &&
+    url != "/users/sendemail"
+  ) {
     console.log("进入app.js拦截器,打印result");
     /*没有弄明白怎么在headers中设置token
     let token = req.headers.token;
     */
-    if (req.query.token){
+    if (req.query.token) {
       console.log("从req.query中获得token");
       var token = req.query.token;
-      console.log(token)
+      console.log(token);
     }
     if (req.headers.token) {
       console.log("从req.headers中获得token");
       var token = req.headers["authorization"];
     }
-    
+
     let jwt = new JwtUtil(token);
     let result = jwt.verifyToken();
     // 如果考验通过就next，否则就返回登陆信息不正确（与jwt.js返回有关）
-    if (result == 'err') {
-      console.log('token已过期，被拦截器拦截');
+    if (result == "err") {
+      console.log("token已过期，被拦截器拦截");
       console.log(result);
       res.send({ status: 403, msg: "尚未登录(登录已过期),请重新登录!" });
     } else {
-      console.log('token没过期,驶出拦截器,进入对应的路由')
+      console.log("token没过期,驶出拦截器,进入对应的路由");
       next();
     }
   } else {

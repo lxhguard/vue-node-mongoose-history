@@ -153,7 +153,44 @@ Authorization字段添加token
      在后台首先在跨域请求中允许Authorization，然后获取请求头中的token
      res.header("Access-Control-Allow-Headers", "Authorization");
      var token = req.headers["authorization"];
-24().
+24(未解决).select不能初始化，加上created都不行。
+created(){
+　　　　　//如果没有这句代码，select中初始化会是空白的，默认选中就无法实现
+        this.info.sex = this.sexList[0].value;
+    },//可是这个起作用
+25.(已解决).后台得到的formData一直为空，后来发现需要嵌套一个upload函数，我已经定义了，
+用在router的第一层就好.
+26.(知识点)//canvas.toDataURL(type, encoderOptions);
+//图片格式，默认为image/png。图片质量，取值范围为0到1。返回值：包含dataURI的DOMString。
+//在转换成dataURI前必须先确保图片成功加载到，于是.toDataURL()方法应该写在<img>的onload异步事件中。
+27(知识点).脑子一下空白了，忘记怎么绑定key
+v-for="(posting,index) in postings" :key="index"
+28(知识点).content 属性与 :before 及 :after 伪元素配合使用，来插入生成内容。
+该属性用于定义元素之前或之后放置的生成内容。默认地，这往往是行内内容，
+不过该内容创建的框类型可以用属性 display 控制。
+29(经验借鉴).在postings.vue中借鉴了QQ空间说说的样式.
+30(疑问 已解决).模拟hover,怎么在在组件中用set，
+@mouseout="$set(showMenu,false)" 会报错
+模拟下拉菜单：思路：加一个定时器。菜单盒子：onmouseleave 时 启动定时器来关闭菜单
+               菜单列表：onmouseon 时 clearSetTimeout
+代码实现:WillShowMenu(){//更多操作 显示
+            this.showMenu = true;
+            clearInterval(this.timer)
+        },
+        NotShowMenu(){//更多操作 关闭
+            this.timer = setInterval( () => {　
+                this.showMenu = false;
+    　　　　　　}, 100);
+            
+        },
+31(项目点).node做一个简单的邮件反馈，依赖第三方模块：npm install nodemailer
+(已解决).之前测试好好的，改了一下前端，突然发送邮件就报错了。完全没找到思路解决.
+{ TypeError [ERR_INVALID_ARG_TYPE]: The "chunk" argument must be one of type string or Buffer. Received type number
+解决方案：html: randomFns.toString()
+邮件信息必须是字符串。
+
+32(踩坑点).post发送应该发送对象，发送字符串,
+后台会接收{ dddd: '' }，dddd其实是前端发送的字符串的数值
 
 
 

@@ -24,10 +24,10 @@
               <span style="color:#2d8cf0;">还没账号？立即</span><Button type="warning" ghost  @click="showR">注册</Button>
             </div>
             <div id="register" v-if="showRegister">
-              <Input v-model="rname" prefix="ios-contact" placeholder="Enter name" style="width: auto;" /><br><br>
-              <Input v-model="rpassword" prefix="md-key" placeholder="Enter password" style="width: auto;" /><br><br>
-              <Input v-model="remail" prefix="ios-mail" placeholder="Enter email" style="width: auto;" /><br><br>
-              <span><Input v-model="vcode" placeholder="captcha" style="width: 65px;" /></span>
+              <Input v-model="registerUser.rname" prefix="ios-contact" placeholder="Enter name" style="width: auto;" /><br><br>
+              <Input v-model="registerUser.rpassword" prefix="md-key" placeholder="Enter password" style="width: auto;" /><br><br>
+              <Input v-model="registerUser.remail" prefix="ios-mail" placeholder="Enter email" style="width: auto;" /><br><br>
+              <span><Input v-model="registerUser.vcode" placeholder="captcha" style="width: 65px;" /></span>
               <span><Button type="primary" v-show="showIt" @click="sendcode" style="width: 100px;">获取验证码</Button></span>
               <span><Button type="primary" v-show="!showIt" @click="sendcode" style="width: 100px;" disabled>{{btntxt}}</Button></span><br><br>
               <Button type="success"  @click="RegisterNew">Register</Button><br><br>
@@ -57,6 +57,7 @@ import store from '../../vuex/store'
 import Loading from './Loading/Loading'
 import {isMail} from '../../static/common/common.js'
 import {isLegal} from '../../static/common/common.js'
+import {isRange} from '../../static/common/common.js'
 
 
 export default {
@@ -68,10 +69,12 @@ export default {
       showRegister:false,
       user_name:'',
       user_password:'',
-      rname:'',
-      rpassword:'',
-      remail:'',
-      vcode:'',
+      registerUser:{
+        rname:'',
+        rpassword:'',
+        remail:'',
+        vcode:'',
+      },
       btntxt:"获取验证码",
       time:0
     }
@@ -95,8 +98,31 @@ export default {
         },
         // 发送验证码到邮箱
         sendcode(){
+          //60s之后才能点击
           this.time=60;
           this.timer();
+          //请求后台发送验证码至用户邮箱
+          if(isMail(this.registerUser.remail)){
+            this.$axios({
+                url:"http://localhost:4444/users/sendemail",
+                method:"post",
+                data:this.registerUser
+            })
+            .then(res=>{
+                if(res.data.status == 200){
+                  this.$Message.info(res.data.msg);
+                }else{
+                  this.$Message.info('发生错误，验证码未能发送至您的邮箱!');
+                }
+            })
+            .catch(err=>{
+                console.log(err)
+            })
+          }else{
+            this.$Message.info('邮箱格式不正确！');
+          }
+          
+          
         },
         // 多少秒后重新发送
         timer() {
@@ -114,29 +140,44 @@ export default {
         },
         // 注册新用户
         RegisterNew(){
-          var Send_params = {};
-          this.$axios.get('https://www.apiopen.top/journalismApi')
-                    .then(res=>{
-                        alert('成功')
-                        console.log(res)//返回请求的结果
-                    })
-                    .catch(err=>{
-                        console.log(err)
+          
+          if(this.registerUser.rname.length) {
+            if(isRange(this.registerUser.rname,0,12)){
+					    if(isRange(this.registerUser.rpassword,0,16)){
+                if(isMail(this.registerUser.remail)){
+                  this.$axios({
+                      url:"http://localhost:4444/users/register",
+                      method:"post",
+                      data:this.registerUser
                   })
-          if(this.rname.length) {
-            if(isRange(this.rname,0,12)){
-					    if(isMail(this.remail)){
-                if(isRange(this.rpassword,0,16)){
-                  params = {
-                    name :this.rname,
-                    password : this.rpassword,
-                    email : this.remail
-                  };
-                  
-                }//end rpassword-if
+                  .then(res=>{
+                      if(res.data.status == 200){
+                        this.$Message.info(res.data.msg);
+                        this.registerUser = {
+                                              rname:'',
+                                              rpassword:'',
+                                              remail:'',
+                                              vcode:'',
+                                            };
+                      }else{
+                        this.$Message.info(res.data.msg);
+                      }
+                  })
+                  .catch(err=>{
+                      console.log(err)
+                  })
+                }else{
+                  this.$Message.info('您填写的邮箱格式不正确!');
+                }
+              }else{
+                this.$Message.info('您的密码长度应该在1-16位！');
               }
+            }else{
+              this.$Message.info('用户名长度最大为12个字母');
             }
-          }//end name.length-if
+          }else{
+            this.$Message.info('用户名不能为空!');
+          }
 
         },
         // 用户登录
@@ -147,10 +188,10 @@ export default {
               "user_password":this.user_password
             };
             if (Send_params.user_name == '') {
-              alert('用户名不能为空');
+              this.$Message.info('用户名不能为空');
             }else{
               if (Send_params.user_password == '') {
-                alert('密码不能为空!');
+                this.$Message.info('密码不能为空!');
               }else{
                 //登录接口
                 this.$axios({
@@ -171,10 +212,10 @@ export default {
                       //本地存储 token 和 user_name
                       localStorage.setItem('token', res.data.token);
                       localStorage.setItem('user_name', res.data.user_name);
-                      alert('登录成功');
+                      this.$Message.info('登录成功');
                       this.$router.push('/world');
                     }else{
-                      alert(res.data.msg);
+                      this.$Message.info(res.data.msg);
                       this.$router.push('/login');
                     }
                     

@@ -11,6 +11,8 @@ module.exports = new mongoose.Schema({
   },
   //密码
   password: String,
+  //邮箱
+  email: String,
   //性别,
   sex:{
     type: String,
